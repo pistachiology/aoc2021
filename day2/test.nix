@@ -15,21 +15,21 @@ let
   /* list of horizontal of aim of depth  */
   rowToList = { cmd, val }:
     if cmd == "forward" then
-      [ (add val) id (calDepth val) ]
+      { x = (add val); y = (calDepth val); aim = id; }
     else if cmd == "down" then
-      [ id (add val) nullDepth ]
+      { x = id; y = nullDepth; aim = (add val); }
     else
-      [ id (add (-val)) nullDepth ];
+      { x = id; y = nullDepth; aim = (add (-val)); };
 
-  combine = (val: fx: [
-    ((elemAt fx 0) (elemAt val 0))
-    ((elemAt fx 1) (elemAt val 1))
-    ((elemAt fx 2) (elemAt val 1) (elemAt val 2))
-  ]);
+  combine = (val: f: {
+    x = (f.x val.x);
+    y = (f.y val.aim val.y);
+    aim = (f.aim val.aim);
+  });
 
   rowsToLists = map rowToList;
-  listsToPos = lists.foldl combine [ 0 0 0 ];
-  posToAns = pos: mul (elemAt pos 0) (elemAt pos 2);
+  listsToPos = lists.foldl combine { x = 0; y = 0; aim = 0; };
+  posToAns = pos: mul pos.x pos.y;
 
   rawInput = builtins.readFile ./input.txt;
   parseLine = line: with strings;
