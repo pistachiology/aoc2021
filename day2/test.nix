@@ -12,8 +12,15 @@ let
   nullDepth = aim: depth: depth;
   calDepth = fw: aim: depth: (fw * aim) + depth;
 
-  /* list of horizontal of aim of depth  */
-  rowToList = { cmd, val }:
+  rowToList1 = { cmd, val }:
+    if cmd == "forward" then
+      { x = (add val); y = nullDepth; aim = id; }
+    else if cmd == "down" then
+      { x = id; y = (aim: depth: depth + val); aim = id; }
+    else
+      { x = id; y = (aim: depth: depth - val); aim = id; };
+
+  rowToList2 = { cmd, val }:
     if cmd == "forward" then
       { x = (add val); y = (calDepth val); aim = id; }
     else if cmd == "down" then
@@ -27,7 +34,6 @@ let
     aim = (f.aim val.aim);
   });
 
-  rowsToLists = map rowToList;
   listsToPos = lists.foldl combine { x = 0; y = 0; aim = 0; };
   posToAns = pos: mul pos.x pos.y;
 
@@ -41,6 +47,7 @@ let
       (filter notEmpty
         (splitString "\n" rawInput)));
 
-  solve = rows: (posToAns (listsToPos (rowsToLists rows)));
+  solve1 = rows: (posToAns (listsToPos (map rowToList1 rows)));
+  solve2 = rows: (posToAns (listsToPos (map rowToList2 rows)));
 in
-(solve rows)
+[ (solve1 rows) (solve2 rows) ]
